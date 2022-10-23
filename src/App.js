@@ -1,7 +1,6 @@
 import React from 'react';
 import Sidebar from './components/Sidebar';
 import Editor from './components/Editor';
-import { data } from './data';
 import Split from 'react-split';
 import { nanoid } from 'nanoid';
 
@@ -34,12 +33,17 @@ export default function App() {
 		});
 	}
 
+	function deleteNote(event, noteId) {
+		event.stopPropagation();
+		setNotes(oldNotes => oldNotes.filter(note => note.id !== noteId));
+	}
+
 	function findCurrentNote() {
-		return (
-			notes.find(note => {
-				return note.id === currentNoteId;
-			}) || notes[0]
-		);
+		const currentNote = notes.find(note => note.id === currentNoteId) || notes[0];
+		if (currentNote === notes[0] && currentNoteId !== currentNote.id) {
+			setCurrentNoteId(currentNote.id);
+		}
+		return currentNote;
 	}
 
 	return (
@@ -51,6 +55,7 @@ export default function App() {
 						currentNote={findCurrentNote()}
 						setCurrentNoteId={setCurrentNoteId}
 						newNote={createNewNote}
+						deleteNote={deleteNote}
 					/>
 					{currentNoteId && notes.length > 0 && (
 						<Editor currentNote={findCurrentNote()} updateNote={updateNote} />
